@@ -5,7 +5,7 @@ Red []
 
 REDMODULE-PATH: to-red-file rejoin [get-env either system/platform == 'Windows ["USERPROFILE"]["HOME"] %/.red/redmodule.red]
 unless exists? REDMODULE-PATH [write REDMODULE-PATH read https://raw.githubusercontent.com/nabinno/redmodule/master/redmodule.red]
-do REDMODULE-PATH
+do/args REDMODULE-PATH system/options/path
 
 ;-- Example modules
 modules: [
@@ -14,7 +14,7 @@ modules: [
     http-tools #(name: "HTTP Tools" init: %http-tools.red git: https://github.com/rebolek/red-tools)
     regex #(name: "Regex" init: %regex.red git: https://github.com/toomasv/regex)
 ]
-redmodule/get modules system/options/path
+redmodule/get modules
 do-redmodule [red-elixir]
 ```
 

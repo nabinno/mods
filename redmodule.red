@@ -1,14 +1,15 @@
 Red []
 
+CURRENT-PATH: system/script/args
+
 redmodule: context [
-    MODULE-DIRECTORY: %red_modules/
+    MODULE-DIRECTORY: rejoin [CURRENT-PATH %red_modules/]
     MODULES: [] ; @type series!.<key [word!] #(name [string!] init [path!] git [url!] require [series!])>
     unless exists? MODULE-DIRECTORY [make-dir MODULE-DIRECTORY]
 
-    get: func [packages [series!] current-path][
+    get: func [packages [series!]][
         if empty? packages [__error/raise rejoin ["Packages does not exist."]]
 
-        self/MODULE-DIRECTORY: to-red-file rejoin [current-path MODULE-DIRECTORY]
         self/MODULES: packages
         package-maps: __keyword/values MODULES
         __series/each package-maps pm [redmodule/__do-git-submodule pm/git]
