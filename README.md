@@ -33,7 +33,7 @@ do/args %require [red-elixir]
 ## Functions
 - `mods/get` - Add submodules in Git and set modules into Red.
 - `mods/clean` - Remove all submodules.
-- `do-mods` - Explicitly do modules.
+- `do/args %require` - Explicitly do modules.
 
 ---
 
