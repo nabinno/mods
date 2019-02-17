@@ -4,9 +4,11 @@ CURRENT-PATH: system/script/args
 
 mods: context [
     MODULE-DIRECTORY: rejoin [CURRENT-PATH %mods/]
+    GITMODULES-PATH: rejoin [CURRENT-PATH %.gitmodules]
     REQUIRE-PATH: %github.com/nabinno/mods/require.red
     MODS-KEYWORD: [mods #(init: mods.red git: https://github.com/nabinno/mods)]
     unless exists? MODULE-DIRECTORY [make-dir MODULE-DIRECTORY]
+    unless exists? GITMODULES-PATH [write GITMODULES-PATH ""]
 
     get: does [
         modules: __get-modules
@@ -16,7 +18,10 @@ mods: context [
         __set-require
     ]
 
-    clean: does [call rejoin ["rm -fr " MODULE-DIRECTORY]]
+    clean: does [
+        if exists? GITMODULES-PATH [delete GITMODULES-PATH]
+        if exists? MODULE-DIRECTORY [call rejoin ["rm -fr " MODULE-DIRECTORY]]
+    ]
 
     __do-git-submodule: func [git-path [url!]][
         path-series: split git-path "/" domain: third path-series name: fourth path-series repo: fifth path-series
