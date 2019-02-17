@@ -4,6 +4,8 @@ CURRENT-PATH: system/script/args
 
 mods: context [
     MODULE-DIRECTORY: rejoin [CURRENT-PATH %mods/]
+    REQUIRE-PATH: %github.com/nabinno/mods/require.red
+    MODS-KEYWORD: [mods #(init: mods.red git: https://github.com/nabinno/mods)]
     unless exists? MODULE-DIRECTORY [make-dir MODULE-DIRECTORY]
 
     get: does [
@@ -11,6 +13,7 @@ mods: context [
         package-maps: __keyword/values modules
         __series/each package-maps pm [mods/__do-git-submodule pm/git]
         call "git submodule foreach git pull origin master"
+        __set-require
     ]
 
     clean: does [call rejoin ["rm -fr " MODULE-DIRECTORY]]
@@ -23,23 +26,8 @@ mods: context [
         call/wait rejoin ["git submodule absorbgitdirs " local-path]
     ]
 
-    __require: func [module-names [word! block! none!]][
-        modules: __get-modules
-        module-names: either module-names [append [] module-names][__keyword/keys modules]
-        __series/each module-names mn [mods/__do-require modules mn]
-    ]
-
-    __do-require: func [modules [series!] name][
-        package: __keyword/get modules name ; @type #(name [string!] init [path!] git [path!] require [series!])
-        unless package [__error/raise rejoin ["Package " name " does not exist."]]
-
-        path-series: split package/git "/" domain: third path-series name: fourth path-series repo: fifth path-series
-        init-file: to-red-file rejoin [MODULE-DIRECTORY domain "/" name "/" repo "/" package/init]
-        unless exists? init-file [__error/raise rejoin ["Initial file " init-file " does not exist."]]
-
-        if package/require [foreach rp package/require [do-call rp]]
-
-        do init-file
+    __set-require: does [
+        write rejoin [CURRENT-PATH %require] read rejoin [MODULE-DIRECTORY REQUIRE-PATH]
     ]
 
     ; @return series!.<key [word!] #(name [string!] init [path!] git [url!] require [series!])>
@@ -48,7 +36,7 @@ mods: context [
         either empty? hots/mods [
             __error/raise rejoin ["Does not setup hots/mods."]
         ][
-            hots/mods
+            append hots/mods MODS-KEYWORD
         ]
     ]
 
@@ -78,5 +66,3 @@ mods: context [
 
     __error: context [raise: func [message][do make error! message]]
 ]
-
-do-mods: :mods/__require

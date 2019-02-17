@@ -13,7 +13,6 @@ Red []
 
 hots: context [
     mods: [
-        do-mods #(init: %mods.red git: https://github.com/nabinno/mods)
         red-elixir #(init: %init.red git: https://github.com/nabinno/red-elixir)
         json #(init: %json.red git: https://github.com/rebolek/red-tools)
         http-tools #(init: %http-tools.red git: https://github.com/rebolek/red-tools)
@@ -28,8 +27,7 @@ hots: context [
 ```red:init.red
 Red []
 
-do %mods/github.com/nabinno/mods/mods.red
-do-mods [red-elixir]
+do/args %require [red-elixir]
 ```
 
 ## Functions
