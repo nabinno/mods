@@ -12,7 +12,7 @@ mods: context [
         modules: __get-modules
         package-maps: __keyword/values modules
         __series/each package-maps pm [mods/__do-git-submodule pm/git]
-        call "git submodule foreach git pull origin master"
+        call/wait "git submodule foreach git pull origin master"
         __set-require
     ]
 
