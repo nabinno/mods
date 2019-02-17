@@ -2,28 +2,18 @@ Red []
 
 CURRENT-PATH: system/script/args
 
-redmodule: context [
-    MODULE-DIRECTORY: rejoin [CURRENT-PATH %red_modules/]
-    MODULES: [] ; @type series!.<key [word!] #(name [string!] init [path!] git [url!] require [series!])>
+mods: context [
+    MODULE-DIRECTORY: rejoin [CURRENT-PATH %mods/]
     unless exists? MODULE-DIRECTORY [make-dir MODULE-DIRECTORY]
 
-    get: func [packages [series!]][
-        if empty? packages [__error/raise rejoin ["Packages does not exist."]]
-
-        self/MODULES: packages
-        package-maps: __keyword/values MODULES
-        __series/each package-maps pm [redmodule/__do-git-submodule pm/git]
+    get: does [
+        modules: __get-modules
+        package-maps: __keyword/values modules
+        __series/each package-maps pm [mods/__do-git-submodule pm/git]
         call "git submodule foreach git pull origin master"
     ]
 
     clean: does [call rejoin ["rm -fr " MODULE-DIRECTORY]]
-
-    require: func [module-names [word! block! none!]][
-        if empty? MODULES [__error/raise rejoin ["Does not setup MODULES."]]
-
-        module-names: either module-names [append [] module-names][__keyword/keys MODULES]
-        __series/each module-names mn [redmodule/__do-require mn]
-    ]
 
     __do-git-submodule: func [git-path [url!]][
         path-series: split git-path "/" domain: third path-series name: fourth path-series repo: fifth path-series
@@ -33,8 +23,14 @@ redmodule: context [
         call/wait rejoin ["git submodule absorbgitdirs " local-path]
     ]
 
-    __do-require: func [name][
-        package: __keyword/get MODULES name ; @type #(name [string!] init [path!] git [path!] require [series!])
+    __require: func [module-names [word! block! none!]][
+        modules: __get-modules
+        module-names: either module-names [append [] module-names][__keyword/keys modules]
+        __series/each module-names mn [mods/__do-require modules mn]
+    ]
+
+    __do-require: func [modules [series!] name][
+        package: __keyword/get modules name ; @type #(name [string!] init [path!] git [path!] require [series!])
         unless package [__error/raise rejoin ["Package " name " does not exist."]]
 
         path-series: split package/git "/" domain: third path-series name: fourth path-series repo: fifth path-series
@@ -44,6 +40,16 @@ redmodule: context [
         if package/require [foreach rp package/require [do-call rp]]
 
         do init-file
+    ]
+
+    ; @return series!.<key [word!] #(name [string!] init [path!] git [url!] require [series!])>
+    __get-modules: does [
+        do rejoin [CURRENT-PATH %hots.red]
+        either empty? hots/mods [
+            __error/raise rejoin ["Does not setup hots/mods."]
+        ][
+            hots/mods
+        ]
     ]
 
     __series: context [
@@ -73,4 +79,4 @@ redmodule: context [
     __error: context [raise: func [message][do make error! message]]
 ]
 
-do-redmodule: :redmodule/require
+do-mods: :mods/__require

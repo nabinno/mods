@@ -1,27 +1,41 @@
-# Redmodule --- Package manager with Git Submodules
-## Installation and configuration
+# Mods --- Hot plugin
+Package manager with Git Submodules in Red.
+
+## Installation
+```sh
+> hot cmd/install https://raw.githubusercontent.com/nabinno/mods/master/mods.red
+```
+
+## Configuration
+```red
+> cat hots.red
+Red []
+
+hots: context [
+    mods: [
+        do-mods #(init: %mods.red git: https://github.com/nabinno/mods)
+        red-elixir #(init: %init.red git: https://github.com/nabinno/red-elixir)
+        json #(init: %json.red git: https://github.com/rebolek/red-tools)
+        http-tools #(init: %http-tools.red git: https://github.com/rebolek/red-tools)
+        regex #(init: %regex.red git: https://github.com/toomasv/regex)
+    ]
+]
+
+> hot mods/get
+```
+
+## Getting Started
 ```red:init.red
 Red []
 
-REDMODULE-PATH: to-red-file rejoin [get-env either system/platform == 'Windows ["USERPROFILE"]["HOME"] %/.red/redmodule.red]
-unless exists? REDMODULE-PATH [write REDMODULE-PATH read https://raw.githubusercontent.com/nabinno/redmodule/master/redmodule.red]
-do/args REDMODULE-PATH system/options/path
-
-;-- Example modules
-modules: [
-    red-elixir #(name: "Red Elixir" init: %init.red git: https://github.com/nabinno/red-elixir)
-    json #(name: "JSON" init: %json.red git: https://github.com/rebolek/red-tools)
-    http-tools #(name: "HTTP Tools" init: %http-tools.red git: https://github.com/rebolek/red-tools)
-    regex #(name: "Regex" init: %regex.red git: https://github.com/toomasv/regex)
-]
-redmodule/get modules
-do-redmodule [red-elixir]
+do %mods/github.com/nabinno/mods/mods.red
+do-mods [red-elixir]
 ```
 
 ## Functions
-- `redmodule/get` - Add submodules in Git and set modules into Red.
-- `redmodule/clean` - Remove all submodules.
-- `redmodule/require (do-redmodule)` - Explicitly do modules.
+- `mods/get` - Add submodules in Git and set modules into Red.
+- `mods/clean` - Remove all submodules.
+- `do-mods` - Explicitly do modules.
 
 ---
 
