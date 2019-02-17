@@ -13,7 +13,7 @@ __error: :mods/__error
 require: func [module-names [word! block! none!]][
     modules: __get-modules
     module-names: either module-names [append [] module-names][__keyword/keys modules]
-    __series/each module-names mn [mods/__do-require modules mn]
+    __series/each module-names mn [__do-require modules mn]
 ]
 
 __do-require: func [modules [series!] name][
@@ -32,5 +32,4 @@ __do-require: func [modules [series!] name][
 ;
 ; Main
 ;
-
 require MODULE-NAMES
