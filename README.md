@@ -1,5 +1,5 @@
-# Mods --- Hot plugin
-Package manager with Git Submodules in Red.
+# Mods --- Hot command
+Package manager with Git Submodules in Red lang.
 
 ## Installation
 ```sh
