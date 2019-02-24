@@ -4,6 +4,7 @@ CURRENT-PATH: system/script/args
 
 mods: context [
     MODULE-DIRECTORY: rejoin [CURRENT-PATH %mods/]
+    RELATIVE-MODULE-DIRECTORY: %mods/
     GITMODULES-PATH: rejoin [CURRENT-PATH %.gitmodules]
     REQUIRE-PATH: %github.com/nabinno/mods/require.red
     MODS-KEYWORD: [mods #(init: mods.red git: https://github.com/nabinno/mods)]
@@ -25,7 +26,7 @@ mods: context [
 
     __do-git-submodule: func [git-path [url!]][
         path-series: split git-path "/" domain: third path-series name: fourth path-series repo: fifth path-series
-        local-path: to-string rejoin [MODULE-DIRECTORY domain "/" name "/" repo]
+        local-path: to-string rejoin [RELATIVE-MODULE-DIRECTORY domain "/" name "/" repo]
 
         call rejoin ["git submodule add --force" " --name " local-path " -- " git-path space local-path]
         call/wait rejoin ["git submodule absorbgitdirs " local-path]
