@@ -11,7 +11,7 @@ mods: context [
     unless exists? MODULE-DIRECTORY [make-dir MODULE-DIRECTORY]
     unless exists? GITMODULES-PATH [write GITMODULES-PATH ""]
 
-    get: does [
+    get: function [][
         modules: __get-modules
         package-maps: __keyword/values modules
         __series/each package-maps pm [mods/__do-git-submodule pm/git]
@@ -24,7 +24,7 @@ mods: context [
         if exists? MODULE-DIRECTORY [call rejoin ["rm -fr " MODULE-DIRECTORY]]
     ]
 
-    __do-git-submodule: func [git-path [url!]][
+    __do-git-submodule: function [git-path [url!]][
         path-series: split git-path "/" domain: third path-series name: fourth path-series repo: fifth path-series
         local-path: to-string rejoin [RELATIVE-MODULE-DIRECTORY domain "/" name "/" repo]
 
@@ -32,8 +32,14 @@ mods: context [
         call/wait rejoin ["git submodule absorbgitdirs " local-path]
     ]
 
-    __set-require: does [
-        write rejoin [CURRENT-PATH %require] read rejoin [MODULE-DIRECTORY REQUIRE-PATH]
+    __set-require: function [][
+        require-file: rejoin [MODULE-DIRECTORY REQUIRE-PATH]
+        loop 120 [
+            if exists? require-file [
+                write rejoin [CURRENT-PATH %require] read require-file
+                break
+            ]
+        ]
     ]
 
     ; @return series!.<key [word!] #(name [string!] init [path!] git [url!] require [series!])>
